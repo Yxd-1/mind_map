@@ -1,5 +1,6 @@
 package com.mind_map;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mind_map.entity.Theme;
 import com.mind_map.entity.User;
 import com.mind_map.service.ThemeService;
@@ -26,16 +27,17 @@ class MindMapApplicationTests {
 	@Test
 	void contextLoads() {
 		Theme theme = new Theme();
-		theme.setId(2);
-		theme.setName("测试主题");
-		theme.setChildren(7);
-		theme.setParent(0);
-		themeService.save(theme);
+		LambdaQueryWrapper<Theme> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(Theme::getId, 2);
+		themeService.remove(queryWrapper);
 	}
 
 	@Test
 	void listTest(){
-
+		User user = new User();
+		user.setUsername("ahahha");
+		user.setPassword("123456");
+		userService.save(user);
 	}
 
 

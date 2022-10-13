@@ -11,6 +11,6 @@ import lombok.ToString;
 @ToString
 public class TokenInfo {
 
-    private Integer adminId;
+    private Long adminId;
     private String token;
 }

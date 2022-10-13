@@ -59,12 +59,12 @@ public class UserController {
      * 注册处理
      */
     @PostMapping("/register")
-    public R<String> UserRegister(User user, HttpServletRequest request) {
+    public R<String> UserRegister(@RequestBody User user, HttpServletRequest request) {
         log.info("user register method");
         // 得到用户的账号密码
         String username = user.getUsername();
         String password = user.getPassword();
-        Integer id = user.getId();
+        Long id = user.getId();
 
         // 查看账号是否已存在
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
