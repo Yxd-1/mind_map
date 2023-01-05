@@ -9,11 +9,15 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 @Slf4j
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurationSupport {
+
+    @Resource
+    private JWTInterceptor jwtInterceptor;
 
     /**
      * 拓展mvc框架的消息转换器
@@ -32,6 +36,9 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 跨域拦截器需放在最上面
-        registry.addInterceptor(new JWTInterceptor()).addPathPatterns("/**");
+        registry.addInterceptor(jwtInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/login")
+                .excludePathPatterns("/register");
     }
 }

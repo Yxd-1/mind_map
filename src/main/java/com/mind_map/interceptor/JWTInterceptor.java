@@ -2,11 +2,18 @@ package com.mind_map.interceptor;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mind_map.common.PassToken;
+import com.mind_map.common.UserLoginToken;
+import com.mind_map.entity.User;
+import com.mind_map.service.UserService;
 import com.mind_map.utils.JwtTokenUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,32 +22,60 @@ import java.util.Map;
  */
 public class JWTInterceptor implements HandlerInterceptor {
 
+    @Autowired
+    UserService userService;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        Map<String,Object> map = new HashMap<>();
-        //令牌建议是放在请求头中，获取请求头中令牌
+        // 从 http 请求头中取出 token
         String token = request.getHeader("token");
-        /*try{
-            JwtTokenUtils.verify(token);//验证令牌
-            return true;//放行请求
-        } catch (SignatureVerificationException e) {
-            e.printStackTrace();
-            map.put("msg","无效签名");
-        } catch (TokenExpiredException e) {
-            e.printStackTrace();
-            map.put("msg","token过期");
-        } catch (AlgorithmMismatchException e) {
-            e.printStackTrace();
-            map.put("msg","token算法不一致");
-        } catch (Exception e) {
-            e.printStackTrace();
-            map.put("msg","token失效");
+        // 如果不是映射到方法直接通过
+        if (!(handler instanceof HandlerMethod)) {
+            return true;
         }
-        map.put("state",false);//设置状态
-        //将map转化成json，response使用的是Jackson
-        String json = new ObjectMapper().writeValueAsString(map);
-        response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().print(json);*/
-        return false;
+
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        Method method = handlerMethod.getMethod();
+        //检查方法是否有passToken注解，有则跳过认证，直接通过
+        if (method.isAnnotationPresent(PassToken.class)) {
+            PassToken passToken = method.getAnnotation(PassToken.class);
+            if (passToken.required()) {
+                return true;
+            }
+        }
+
+        //检查有没有需要用户权限的注解
+        if (method.isAnnotationPresent(UserLoginToken.class)) {
+            UserLoginToken userLoginToken = method.getAnnotation(UserLoginToken.class);
+            if (userLoginToken.required()) {
+                // 执行认证
+                if (token == null) {
+                    throw new RuntimeException("无token，请重新登录");
+                }
+                // token是否过期
+                if (JwtTokenUtils.isExpiration(token)) {
+                    throw new RuntimeException("token已过期，请重新登录");
+                }
+                // 获取 token 中的 user id
+                Integer id;
+                try {
+                    id = (Integer) JwtTokenUtils.getTokenBody(token).get("id");
+                } catch (Exception e) {
+                    throw new RuntimeException("token不正确，请不要通过非法手段创建token");
+                }
+                //查询数据库，看看是否存在此用户
+                User user = userService.getById(id);
+                if (user == null) {
+                    throw new RuntimeException("用户不存在，请重新登录");
+                }
+
+                // 验证 token
+                String username = (String) JwtTokenUtils.getTokenBody(token).get("username");
+                if (!username.equals(user.getUsername())) {
+                    throw new RuntimeException("token不正确，请重新登录");
+                }
+            }
+        }
+        throw new RuntimeException("没有权限注解一律不通过");
     }
 }

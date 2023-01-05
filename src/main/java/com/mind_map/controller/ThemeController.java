@@ -2,6 +2,7 @@ package com.mind_map.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mind_map.common.R;
+import com.mind_map.common.UserLoginToken;
 import com.mind_map.entity.Theme;
 import com.mind_map.service.ThemeService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ public class ThemeController {
      * 返回未被删除的主题
      * @return
      */
+    @UserLoginToken
     @GetMapping
     public R<List<Theme>> list(HttpServletRequest request){
         log.info("theme list method");
@@ -37,6 +39,7 @@ public class ThemeController {
      * 返回被删除的主题
      * @return
      */
+    @UserLoginToken
     @GetMapping("/trashBin")
     public R<List<Theme>> listTrashBin(){
         log.info("trash bin list method");
@@ -52,6 +55,7 @@ public class ThemeController {
      * @param theme
      * @return
      */
+    @UserLoginToken
     @PostMapping
     public R<String> save(@RequestBody Theme theme){
         themeService.save(theme);

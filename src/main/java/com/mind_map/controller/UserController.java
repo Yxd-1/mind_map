@@ -3,6 +3,7 @@ package com.mind_map.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mind_map.common.PassToken;
 import com.mind_map.common.R;
 import com.mind_map.dto.TokenInfo;
 import com.mind_map.entity.User;
@@ -27,6 +28,7 @@ public class UserController {
      * 登录处理
      * 登陆成功返回token给前台，之后每调一个接口都需要校验token之后有效
      */
+    @PassToken
     @PostMapping("/login")
     public R<TokenInfo> UserLogin(@RequestBody User user) {
         log.info("user login method");
@@ -43,7 +45,7 @@ public class UserController {
         }
         if (one.getPassword().equals(password)) {
             // 生成token并返回
-            String token = JwtTokenUtils.createToken(username);
+            String token = JwtTokenUtils.createToken(user);
             TokenInfo tokenInfo = new TokenInfo();
             tokenInfo.setAdminId(one.getId());
             tokenInfo.setToken(token);
@@ -58,6 +60,7 @@ public class UserController {
     /**
      * 注册处理
      */
+    @PassToken
     @PostMapping("/register")
     public R<String> UserRegister(@RequestBody User user, HttpServletRequest request) {
         log.info("user register method");

@@ -2,6 +2,7 @@ package com.mind_map.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mind_map.common.R;
+import com.mind_map.common.UserLoginToken;
 import com.mind_map.entity.Node;
 import com.mind_map.service.NodeService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class NodeController {
     @Autowired
     private NodeService nodeService;
 
+    @UserLoginToken
     @GetMapping
     private R<List<Node>> list(@PathVariable Integer id){
         LambdaQueryWrapper<Node> queryWrapper = new LambdaQueryWrapper<>();
