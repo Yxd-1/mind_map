@@ -1,8 +1,10 @@
 package com.mind_map;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mind_map.entity.Node;
 import com.mind_map.entity.Theme;
 import com.mind_map.entity.User;
+import com.mind_map.service.NodeService;
 import com.mind_map.service.ThemeService;
 import com.mind_map.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +26,42 @@ class MindMapApplicationTests {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	private NodeService nodeService;
+
 	@Test
 	void contextLoads() {
 		Theme theme = new Theme();
 		LambdaQueryWrapper<Theme> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(Theme::getId, 2);
 		themeService.remove(queryWrapper);
+	}
+
+	@Test
+	void saveTheme(){
+		Theme theme = new Theme();
+		theme.setUid(1);
+		theme.setTheme("test2");
+		themeService.save(theme);
+	}
+
+	@Test
+	void updateTheme(){
+		Theme theme = new Theme();
+		theme.setId(3);
+		theme.setUid(2);
+		theme.setTheme("testUpdate");
+		themeService.updateById(theme);
+	}
+
+	@Test
+	void saveNode(){
+		Node node = new Node();
+		node.setName("mindmap");
+		node.setRid(1);
+		node.setPid(0);
+		node.setLevel(0);
+		nodeService.save(node);
 	}
 
 	@Test

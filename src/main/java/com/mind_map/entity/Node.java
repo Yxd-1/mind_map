@@ -10,21 +10,27 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class User implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Node implements Serializable {
 
     @TableId(value = "id", type = IdType.AUTO)
-
     private Integer id;
 
-    private String username;
+    private String name;
 
-    private String password;
+    private Integer rid;
+
+    private Integer pid;
+
+    private Integer level;
+
+    private Integer color;
+
+    private String note;
 
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
-    private Integer level;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Date updateTime;
 
 }

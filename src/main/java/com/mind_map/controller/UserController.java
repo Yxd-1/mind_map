@@ -64,7 +64,7 @@ public class UserController {
         // 得到用户的账号密码
         String username = user.getUsername();
         String password = user.getPassword();
-        Long id = user.getId();
+        Integer id = user.getId();
 
         // 查看账号是否已存在
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
