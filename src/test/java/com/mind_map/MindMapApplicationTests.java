@@ -65,11 +65,9 @@ class MindMapApplicationTests {
 	}
 
 	@Test
-	void listTest(){
-		User user = new User();
-		user.setUsername("ahahha");
-		user.setPassword("123456");
-		userService.save(user);
+	void listTheme(){
+		List<Theme> themes = themeService.list();
+		System.out.println(themes);
 	}
 
 

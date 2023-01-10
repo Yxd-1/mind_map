@@ -22,7 +22,7 @@ public class Theme implements Serializable {
     // 用户对应的id
     private Integer uid;
 
-    private Integer delete;
+    private Integer deleted;
 
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;

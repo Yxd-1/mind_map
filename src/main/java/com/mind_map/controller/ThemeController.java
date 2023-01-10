@@ -14,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/theme")
+@RequestMapping("/themes")
 public class ThemeController {
 
     @Autowired
@@ -28,9 +28,9 @@ public class ThemeController {
     @GetMapping
     public R<List<Theme>> list(HttpServletRequest request){
         log.info("theme list method");
-        String token = request.getParameter("token");
+        String token = request.getHeader("token");
         LambdaQueryWrapper<Theme> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Theme::getDelete, 0);
+        queryWrapper.eq(Theme::getDeleted, 0);
         List<Theme> themes = themeService.list(queryWrapper);
         return R.success(themes);
     }
@@ -44,7 +44,7 @@ public class ThemeController {
     public R<List<Theme>> listTrashBin(){
         log.info("trash bin list method");
         LambdaQueryWrapper<Theme> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Theme::getDelete, 1);
+        queryWrapper.eq(Theme::getDeleted, 1);
         List<Theme> themes = themeService.list(queryWrapper);
         return R.success(themes);
     }

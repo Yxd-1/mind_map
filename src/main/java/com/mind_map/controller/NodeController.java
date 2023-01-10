@@ -16,7 +16,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/node")
+@RequestMapping("/nodes")
 public class NodeController {
 
     @Autowired

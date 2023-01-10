@@ -9,6 +9,7 @@ import com.mind_map.dto.TokenInfo;
 import com.mind_map.entity.User;
 import com.mind_map.service.UserService;
 import com.mind_map.utils.JwtTokenUtils;
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,10 +46,12 @@ public class UserController {
         }
         if (one.getPassword().equals(password)) {
             // 生成token并返回
-            String token = JwtTokenUtils.createToken(user);
+            String token = JwtTokenUtils.createToken(one);
             TokenInfo tokenInfo = new TokenInfo();
             tokenInfo.setAdminId(one.getId());
             tokenInfo.setToken(token);
+//            Claims tokenBody = JwtTokenUtils.getTokenBody(token);
+//            Integer id = (Integer) tokenBody.get("id");
             log.info("login success");
             return R.success(tokenInfo);
         }

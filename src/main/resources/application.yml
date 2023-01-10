@@ -21,7 +21,10 @@ spring:
       maxActive: 8
 mybatis-plus:
   configuration:
+    # 开启打印sql配置
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 下划线转驼峰
+    map-underscore-to-camel-case: true
   global-config:
     db-config:
       id-type: ASSIGN_ID
