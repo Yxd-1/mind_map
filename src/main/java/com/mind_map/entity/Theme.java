@@ -1,9 +1,6 @@
 package com.mind_map.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -22,6 +19,9 @@ public class Theme implements Serializable {
     // 用户对应的id
     private Integer uid;
 
+    // 正常为0，删除为1
+    @TableField(fill = FieldFill.INSERT)
+    @TableLogic(value = "0",delval = "1")
     private Integer deleted;
 
     @TableField(fill = FieldFill.INSERT)

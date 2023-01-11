@@ -1,11 +1,13 @@
 package com.mind_map.interceptor;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+@Slf4j
 @Component
 public class DateInterceptor implements MetaObjectHandler {
     /**
@@ -15,9 +17,12 @@ public class DateInterceptor implements MetaObjectHandler {
      */
     @Override
     public void insertFill(MetaObject metaObject) {
+        log.info("start insert fill....");
         //设置属性值
         this.setFieldValByName("createTime", new Date(), metaObject);
         this.setFieldValByName("updateTime", new Date(), metaObject);
+        //添加逻辑删除的默认值0
+        this.setFieldValByName("deleted",0,metaObject);
     }
 
     /**
@@ -27,6 +32,7 @@ public class DateInterceptor implements MetaObjectHandler {
      */
     @Override
     public void updateFill(MetaObject metaObject) {
+        log.info("start update fill....");
         this.setFieldValByName("updateTime", new Date(), metaObject);
     }
 

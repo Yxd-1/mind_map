@@ -1,6 +1,7 @@
 package com.mind_map;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mind_map.dto.NodeTree;
 import com.mind_map.entity.Node;
 import com.mind_map.entity.Theme;
 import com.mind_map.entity.User;
@@ -15,83 +16,126 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @SpringBootTest
 class MindMapApplicationTests {
 
-	@Autowired
-	private ThemeService themeService;
+    @Autowired
+    private ThemeService themeService;
 
-	@Autowired
-	private UserService userService;
+    @Autowired
+    private UserService userService;
 
-	@Autowired
-	private NodeService nodeService;
+    @Autowired
+    private NodeService nodeService;
 
-	@Test
-	void contextLoads() {
-		Theme theme = new Theme();
-		LambdaQueryWrapper<Theme> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(Theme::getId, 2);
-		themeService.remove(queryWrapper);
-	}
+    @Test
+    void contextLoads() {
+        Theme theme = new Theme();
+        LambdaQueryWrapper<Theme> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Theme::getId, 2);
+        themeService.remove(queryWrapper);
+    }
 
-	@Test
-	void saveTheme(){
-		Theme theme = new Theme();
-		theme.setUid(1);
-		theme.setTheme("test2");
-		themeService.save(theme);
-	}
+    @Test
+    void saveTheme() {
+        Theme theme = new Theme();
+        theme.setUid(2);
+        for (int i = 10; i < 20; i++) {
+            theme.setTheme("test" + i);
+            themeService.save(theme);
+        }
+    }
 
-	@Test
-	void updateTheme(){
-		Theme theme = new Theme();
-		theme.setId(3);
-		theme.setUid(2);
-		theme.setTheme("testUpdate");
-		themeService.updateById(theme);
-	}
+    @Test
+    void updateTheme() {
+        Theme theme = new Theme();
+        theme.setId(3);
+        theme.setUid(2);
+        theme.setTheme("testUpdate");
+        themeService.updateById(theme);
+    }
 
-	@Test
-	void saveNode(){
-		Node node = new Node();
-		node.setName("mindmap");
-		node.setRid(1);
-		node.setPid(0);
-		node.setLevel(0);
-		nodeService.save(node);
-	}
+    @Test
+    void deleteTheme(){
+        themeService.removeById(11);
+    }
 
-	@Test
-	void listTheme(){
-		List<Theme> themes = themeService.list();
-		System.out.println(themes);
-	}
+    @Test
+    void saveNode() {
+        Node node = new Node();
+        for (int i = 1; i < 8; i = i + 2) {
+            node.setName("testnode"+i);
+            node.setRid(1);
+            node.setPid(i);
+            node.setLevel(i+1);
+            nodeService.save(node);
+        }
+    }
+
+    @Test
+    void listTheme() {
+        LambdaQueryWrapper<Theme> queryWrapper = new LambdaQueryWrapper<>();
+//        queryWrapper.eq(Theme::getDeleted, 0);
+        queryWrapper.eq(Theme::getUid, 1);
+        queryWrapper.orderByDesc(Theme::getUpdateTime);
+        List<Theme> themes = themeService.list(queryWrapper);
+        System.out.println(themes);
+    }
+
+    @Test
+    void listNode(){
+        // 得到所有节点
+        LambdaQueryWrapper<Node> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Node::getRid, 1);
+        List<Node> nodes = nodeService.list(queryWrapper);
+
+        // 转为交互层对象列表
+        List<NodeTree> nodelist = nodes.stream().map(v -> new NodeTree(v)).collect(Collectors.toList());
+        // 得到树形结构
+        Integer parentId = 0;
+        List<NodeTree> nodeTrees = streamToTree(nodelist, parentId);
+        System.out.println(nodeTrees);
+    }
+
+    private List<NodeTree> streamToTree(List<NodeTree> nodelist, Integer parentId){
+        //将列表结构转为树形结构
+        List<NodeTree> list = nodelist.stream()
+                // 过滤父节点
+                .filter(parent -> parent.getPid().equals(parentId))
+                // 把父节点children递归赋值成为子节点
+                .map(child -> {
+                    child.setChildren(streamToTree(nodelist, child.getId()));
+                    return child;
+                }).collect(Collectors.toList());
+        return list;
+    }
 
 
-	//注入redis客户端
-	@Autowired
-	private StringRedisTemplate redisTemplate;
-	@Test
-	void test() throws InterruptedException {
-		//添加key为name，value为lisi的数据，该数据6秒后过期
-		/**
-		 *	参数1：key值
-		 *	参数2：value值
-		 *	参数3：过期时间
-		 *	参数4：时间单位
-		 */
-		redisTemplate.opsForValue().set("name","lisi",20, TimeUnit.SECONDS);
-		//从数据库中获取对应key的value
-		String value = redisTemplate.opsForValue().get("name");
-		System.out.println(value);
+    //注入redis客户端
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
-		Thread.sleep(6_000);
-		value = redisTemplate.opsForValue().get("name");
-		System.out.println(value);
-	}
+    @Test
+    void test() throws InterruptedException {
+        //添加key为name，value为lisi的数据，该数据6秒后过期
+        /**
+         *	参数1：key值
+         *	参数2：value值
+         *	参数3：过期时间
+         *	参数4：时间单位
+         */
+        redisTemplate.opsForValue().set("name", "lisi", 20, TimeUnit.SECONDS);
+        //从数据库中获取对应key的value
+        String value = redisTemplate.opsForValue().get("name");
+        System.out.println(value);
+
+        Thread.sleep(6_000);
+        value = redisTemplate.opsForValue().get("name");
+        System.out.println(value);
+    }
 
 
 }

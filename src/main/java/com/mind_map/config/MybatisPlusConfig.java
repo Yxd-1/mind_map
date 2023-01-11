@@ -1,5 +1,6 @@
 package com.mind_map.config;
 
+import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;

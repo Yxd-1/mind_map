@@ -5,7 +5,6 @@ import javax.servlet.http.HttpServletRequest;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mind_map.common.PassToken;
 import com.mind_map.common.R;
-import com.mind_map.dto.TokenInfo;
 import com.mind_map.entity.User;
 import com.mind_map.service.UserService;
 import com.mind_map.utils.JwtTokenUtils;
@@ -31,7 +30,7 @@ public class UserController {
      */
     @PassToken
     @PostMapping("/login")
-    public R<TokenInfo> UserLogin(@RequestBody User user) {
+    public R<String> UserLogin(@RequestBody User user) {
         log.info("user login method");
         // 得到用户的账号密码
         String username = user.getUsername();
@@ -47,13 +46,10 @@ public class UserController {
         if (one.getPassword().equals(password)) {
             // 生成token并返回
             String token = JwtTokenUtils.createToken(one);
-            TokenInfo tokenInfo = new TokenInfo();
-            tokenInfo.setAdminId(one.getId());
-            tokenInfo.setToken(token);
 //            Claims tokenBody = JwtTokenUtils.getTokenBody(token);
 //            Integer id = (Integer) tokenBody.get("id");
             log.info("login success");
-            return R.success(tokenInfo);
+            return R.success(token);
         }
 
         log.info("login fail");
@@ -65,7 +61,7 @@ public class UserController {
      */
     @PassToken
     @PostMapping("/register")
-    public R<String> UserRegister(@RequestBody User user, HttpServletRequest request) {
+    public R<String> UserRegister(@RequestBody User user) {
         log.info("user register method");
         // 得到用户的账号密码
         String username = user.getUsername();

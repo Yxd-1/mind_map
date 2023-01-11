@@ -17,10 +17,13 @@ public class Node implements Serializable {
 
     private String name;
 
+    // 主题id
     private Integer rid;
 
+    // 如果为0即为根节点
     private Integer pid;
 
+    // 几级主题
     private Integer level;
 
     private Integer color;
