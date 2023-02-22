@@ -1,9 +1,7 @@
 package com.mind_map.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+import com.mind_map.dto.NodeTree;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -30,10 +28,28 @@ public class Node implements Serializable {
 
     private String note;
 
+    // 正常为0，删除为1
+    @TableField(fill = FieldFill.INSERT)
+    @TableLogic(value = "0",delval = "1")
+    private Integer deleted;
+
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
+    public Node(){
+
+    }
+    public Node(NodeTree nodeTree) {
+        this.id = nodeTree.getId();
+        this.name = nodeTree.getName();
+        this.rid = nodeTree.getRid();
+        this.pid = nodeTree.getPid();
+        this.level = nodeTree.getLevel();
+        this.color = nodeTree.getColor();
+        this.note = nodeTree.getNote();
+        this.deleted = nodeTree.getDeleted();
+    }
 }

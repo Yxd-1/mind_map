@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -97,7 +99,20 @@ class MindMapApplicationTests {
         // 得到树形结构
         Integer parentId = 0;
         List<NodeTree> nodeTrees = streamToTree(nodelist, parentId);
-        System.out.println(nodeTrees);
+
+        List<Node> list = new ArrayList<>();
+        Stack<NodeTree> stack = new Stack<>();
+        stack.push(nodeTrees.get(0));
+        while (!stack.isEmpty()) {
+            NodeTree node = stack.pop();
+            list.add(new Node(node));
+
+            List<NodeTree> children = node.getChildren();
+            for (NodeTree child : children) {
+                stack.push(child);
+            }
+        }
+        System.out.println(list);
     }
 
     private List<NodeTree> streamToTree(List<NodeTree> nodelist, Integer parentId){
@@ -111,6 +126,11 @@ class MindMapApplicationTests {
                     return child;
                 }).collect(Collectors.toList());
         return list;
+    }
+
+    @Test
+    private void updateNode(){
+
     }
 
 

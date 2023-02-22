@@ -34,6 +34,8 @@ public class NodeTree implements Serializable {
 
     private String note;
 
+    private Integer deleted;
+
     private List<NodeTree> children;
 
     public NodeTree(Node node) {
@@ -44,6 +46,7 @@ public class NodeTree implements Serializable {
         this.level = node.getLevel();
         this.color = node.getColor();
         this.note = node.getNote();
+        this.deleted = node.getDeleted();
     }
 
 }
