@@ -88,13 +88,15 @@ public class ThemeController {
      */
     @UserLoginToken
     @PostMapping
-    public R<String> save(@RequestBody Theme theme, HttpServletRequest request){
+    public R<String> save(@RequestBody Theme theme){
         log.info("theme save method");
         // 得到用户的id
-        String token = request.getHeader("token");
-        Integer id = (Integer) JwtTokenUtils.getTokenBody(token).get("id");
+//        String token = request.getHeader("token");
+//        Integer id = (Integer) JwtTokenUtils.getTokenBody(token).get("id");
         // 在前端进行限制，主题名字等不能为空，长度也应有限
-        theme.setUid(id);
+//        Theme theme = new Theme();
+//        theme.setTheme(themeName);
+//        theme.setUid(1);
         themeService.save(theme);
         return R.success("success");
     }
@@ -109,9 +111,9 @@ public class ThemeController {
 
     @UserLoginToken
     @DeleteMapping
-    public R<String> delete(HttpServletRequest request){
+    public R<String> delete(@RequestParam("id") Integer id){
         log.info("theme delete method");
-        Integer id = Integer.valueOf(request.getParameter("id"));
+//        Integer id = Integer.valueOf(request.getParameter("id"));
         themeService.removeById(id);
 
         return R.success("success");

@@ -1,6 +1,7 @@
 package com.mind_map;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mind_map.common.R;
 import com.mind_map.dto.NodeTree;
 import com.mind_map.entity.Node;
 import com.mind_map.entity.Theme;
@@ -15,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
@@ -61,20 +63,22 @@ class MindMapApplicationTests {
     }
 
     @Test
-    void deleteTheme(){
+    void deleteTheme() {
         themeService.removeById(11);
     }
 
     @Test
     void saveNode() {
         Node node = new Node();
-        for (int i = 1; i < 8; i = i + 2) {
-            node.setName("testnode"+i);
-            node.setRid(1);
-            node.setPid(i);
-            node.setLevel(i+1);
-            nodeService.save(node);
-        }
+
+        node.setId(4);
+        node.setTopic("testnode222");
+        node.setRid(1);
+        node.setPid(3);
+        node.setLevel(3);
+        node.setDeleted(0);
+        nodeService.updateById(node);
+
     }
 
     @Test
@@ -88,7 +92,7 @@ class MindMapApplicationTests {
     }
 
     @Test
-    void listNode(){
+    void listNode() {
         // 得到所有节点
         LambdaQueryWrapper<Node> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Node::getRid, 1);
@@ -115,7 +119,7 @@ class MindMapApplicationTests {
         System.out.println(list);
     }
 
-    private List<NodeTree> streamToTree(List<NodeTree> nodelist, Integer parentId){
+    private List<NodeTree> streamToTree(List<NodeTree> nodelist, Integer parentId) {
         //将列表结构转为树形结构
         List<NodeTree> list = nodelist.stream()
                 // 过滤父节点
@@ -129,8 +133,51 @@ class MindMapApplicationTests {
     }
 
     @Test
-    private void updateNode(){
+    private void updateNode() {
+        NodeTree nodelist = new NodeTree();
+        // 将树形结构转为列表结构
+        List<Node> list = new ArrayList<>();
+        Stack<NodeTree> stack = new Stack<>();
+        stack.push(nodelist);
+        while (!stack.isEmpty()) {
+            NodeTree node = stack.pop();
+            list.add(new Node(node));
 
+            List<NodeTree> children = node.getChildren();
+            if (null == children) continue;
+            Collections.reverse(children);
+            for (NodeTree child : children) {
+                stack.push(child);
+            }
+        }
+        // 得到原本的所有节点
+        LambdaQueryWrapper<Node> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Node::getRid, nodelist.getRid());
+        List<Node> list1 = nodeService.list(queryWrapper);
+
+        // 取交集
+        List<Integer> idList1 = list1.stream()
+                .map(obj -> obj.getId())
+                .collect(Collectors.toList());
+        List<Integer> idList2 = list.stream()
+                .map(obj -> obj.getId())
+                .collect(Collectors.toList());
+        List<Integer> intersection = idList1.stream()
+                .filter(idList2::contains)
+                .collect(Collectors.toList());
+        idList1.removeAll(intersection);
+
+        // 移除多余的
+        nodeService.removeByIds(idList1);
+
+        // 若id存在，则update，若id不存在，则insert
+        for (Node node : list) {
+            if (null == nodeService.getById(node.getId())) {
+                nodeService.save(node);
+            } else {
+                nodeService.updateById(node);
+            }
+        }
     }
 
 

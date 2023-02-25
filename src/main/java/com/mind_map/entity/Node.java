@@ -10,10 +10,10 @@ import java.util.Date;
 @Data
 public class Node implements Serializable {
 
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.INPUT)
     private Integer id;
 
-    private String name;
+    private String topic;
 
     // 主题id
     private Integer rid;
@@ -21,12 +21,16 @@ public class Node implements Serializable {
     // 如果为0即为根节点
     private Integer pid;
 
+    private String direction;
+
     // 几级主题
     private Integer level;
 
     private Integer color;
 
     private String note;
+
+    private Boolean expanded;
 
     // 正常为0，删除为1
     @TableField(fill = FieldFill.INSERT)
@@ -44,12 +48,14 @@ public class Node implements Serializable {
     }
     public Node(NodeTree nodeTree) {
         this.id = nodeTree.getId();
-        this.name = nodeTree.getName();
+        this.topic = nodeTree.getTopic();
         this.rid = nodeTree.getRid();
         this.pid = nodeTree.getPid();
+        this.direction = nodeTree.getDirection();
         this.level = nodeTree.getLevel();
         this.color = nodeTree.getColor();
         this.note = nodeTree.getNote();
+        this.expanded = nodeTree.getExpanded();
         this.deleted = nodeTree.getDeleted();
     }
 }
