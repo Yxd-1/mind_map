@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mind_map.common.R;
 import com.mind_map.common.UserLoginToken;
+import com.mind_map.entity.Node;
 import com.mind_map.entity.Theme;
+import com.mind_map.service.NodeService;
 import com.mind_map.service.ThemeService;
 import com.mind_map.utils.JwtTokenUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,9 @@ public class ThemeController {
 
     @Autowired
     private ThemeService themeService;
+
+    @Autowired
+    private NodeService nodeService;
 
     /**
      * 返回未被删除的主题
@@ -90,13 +95,16 @@ public class ThemeController {
     @PostMapping
     public R<String> save(@RequestBody Theme theme){
         log.info("theme save method");
-        // 得到用户的id
-//        String token = request.getHeader("token");
-//        Integer id = (Integer) JwtTokenUtils.getTokenBody(token).get("id");
-        // 在前端进行限制，主题名字等不能为空，长度也应有限
-//        Theme theme = new Theme();
-//        theme.setTheme(themeName);
-//        theme.setUid(1);
+        if (null == theme.getId()){
+            themeService.save(theme);
+            Integer id = theme.getId();
+            Node node = new Node();
+            node.setRid(id);
+            node.setTopic("New MindMap");
+            node.setDirection("right");
+            nodeService.save(node);
+            return R.success("success");
+        }
         themeService.save(theme);
         return R.success("success");
     }

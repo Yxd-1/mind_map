@@ -46,11 +46,11 @@ class MindMapApplicationTests {
     @Test
     void saveTheme() {
         Theme theme = new Theme();
-        theme.setUid(2);
-        for (int i = 10; i < 20; i++) {
-            theme.setTheme("test" + i);
-            themeService.save(theme);
-        }
+        theme.setTheme("test111");
+        theme.setUid(1);
+        themeService.save(theme);
+        Integer id = theme.getId();
+        System.out.println(id);
     }
 
     @Test
@@ -71,13 +71,12 @@ class MindMapApplicationTests {
     void saveNode() {
         Node node = new Node();
 
-        node.setId(4);
-        node.setTopic("testnode222");
-        node.setRid(1);
-        node.setPid(3);
+        node.setTopic("testNode222");
+        node.setRid(6);
+        node.setPid(0);
         node.setLevel(3);
         node.setDeleted(0);
-        nodeService.updateById(node);
+        nodeService.save(node);
 
     }
 
