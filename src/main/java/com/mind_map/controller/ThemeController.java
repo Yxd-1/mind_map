@@ -93,8 +93,11 @@ public class ThemeController {
      */
     @UserLoginToken
     @PostMapping
-    public R<String> save(@RequestBody Theme theme){
+    public R<String> save(@RequestBody Theme theme, HttpServletRequest request){
         log.info("theme save method");
+        String token = request.getHeader("token");
+        Integer uid = (Integer) JwtTokenUtils.getTokenBody(token).get("id");
+        theme.setUid(uid);
         if (null == theme.getId()){
             themeService.save(theme);
             Integer id = theme.getId();
